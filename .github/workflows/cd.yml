@@ -18,8 +18,10 @@ jobs:
 
       - name: Stop existing container
         run: |
-          docker stop ci-docker-app 2>$null
-          docker rm ci-docker-app 2>$null
+          $container = docker ps -aq -f "name=^ci-docker-app$"
+          if ($container) {
+            docker rm -f ci-docker-app
+          }
 
       - name: Run Docker container
         run: docker run -d --name ci-docker-app -p 8000:8000 ci-docker-app:latest
