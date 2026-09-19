@@ -1,0 +1,28 @@
+name: CD Docker Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t ci-docker-app:latest .
+
+      - name: Stop existing container
+        run: |
+          docker stop ci-docker-app 2>$null
+          docker rm ci-docker-app 2>$null
+
+      - name: Run Docker container
+        run: docker run -d --name ci-docker-app -p 8000:8000 ci-docker-app:latest
+
+      - name: Verify container
+        run: docker ps
